@@ -1,5 +1,6 @@
 package spring.road.beans.support;
 
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -9,8 +10,7 @@ import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.exception.BeanCreateException;
 import spring.road.beans.exception.BeanDefinitionException;
 import spring.road.beans.utils.ClassUtils;
-
-import java.io.File;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,8 +34,10 @@ public class DefaultBeanFactory implements BeanFactory {
 
     public void loadBeanDefinitions(String configFile) {
         SAXReader reader = new SAXReader();
+        InputStream is=null;
         try {
-            Document doc = reader.read(new File(configFile));
+            is = this.getClass().getResourceAsStream(configFile);
+            Document doc = reader.read(is);
             Element root = doc.getRootElement();
             Iterator<Element> elements = root.elementIterator();
             while (elements.hasNext()) {
@@ -48,6 +50,8 @@ public class DefaultBeanFactory implements BeanFactory {
             }
         } catch (DocumentException e) {
             throw new BeanDefinitionException("Create beanDefinition Fail!", e);
+        }finally {
+           IOUtils.closeQuietly(is);
         }
     }
 
