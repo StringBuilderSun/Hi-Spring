@@ -6,6 +6,8 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import spring.road.beans.core.BeanFactory;
 import spring.road.beans.definition.BeanDefinition;
+import spring.road.beans.exception.BeanCreateException;
+import spring.road.beans.exception.BeanDefinitionException;
 import spring.road.beans.utils.ClassUtils;
 
 import java.io.File;
@@ -20,8 +22,6 @@ public class DefaultBeanFactory implements BeanFactory {
     public static final String ID_ATTRIBUTE = "id";
 
     public static final String CLASS_ATTRIBUTE = "class";
-
-    public static final String SCOPE_ATTRIBUTE = "scope";
     /**
      * beans 声明集合
      */
@@ -47,7 +47,7 @@ public class DefaultBeanFactory implements BeanFactory {
                 beanDefinitionsMap.put(beanName, new BeanDefinition(beanName, className));
             }
         } catch (DocumentException e) {
-            e.printStackTrace();
+            throw new BeanDefinitionException("Create beanDefinition Fail!", e);
         }
     }
 
@@ -67,8 +67,7 @@ public class DefaultBeanFactory implements BeanFactory {
             Class<?> objectBean = classLoader.loadClass(beanName);
             return objectBean.newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new BeanCreateException(beanName, e.getMessage(), e);
         }
-        return null;
     }
 }
