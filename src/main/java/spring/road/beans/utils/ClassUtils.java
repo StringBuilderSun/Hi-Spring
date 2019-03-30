@@ -4,7 +4,7 @@ package spring.road.beans.utils;
  * Created by Administrator on 2019/3/30.
  */
 public abstract class ClassUtils {
-    public static ClassLoader getDefaultClassLoad() {
+    public static ClassLoader getDefaultClassLoader() {
         ClassLoader cl = null;
         //获取当前线程的类加载器
         try {
