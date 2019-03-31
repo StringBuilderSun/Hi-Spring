@@ -1,17 +1,48 @@
 package spring.road.beans.definition;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import spring.road.beans.config.PropertyValue;
+
+import java.util.List;
 
 /**
- * Created by Administrator on 2019/3/29.
+ * User: StringBuilderSun
+ * Created by Shanghai on 2019/3/31.
  */
-@Setter
-@Getter
-@AllArgsConstructor
-public class BeanDefinition {
-    private String beanName;
-    private String className;
+public interface BeanDefinition {
+    /**
+     * 获取beanName
+     *
+     * @return
+     */
+    String getBeanName();
 
+    /**
+     * 获取className
+     *
+     * @return
+     */
+    String getBeanClassName();
+
+    /**
+     * 设置类的作用域
+     *
+     * @param scope
+     */
+    void setScope(String scope);
+
+    /**
+     * 是否是单例模式
+     *
+     * @return
+     */
+    boolean isSingleScope();
+
+    /**
+     * 获取scope
+     *
+     * @return
+     */
+    String getScope();
+
+    List<PropertyValue> getpropertyValueList();
 }

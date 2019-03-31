@@ -8,4 +8,14 @@ public class BeansDefinitionConstants {
     public static final String ID_ATTRIBUTE = "id";
 
     public static final String CLASS_ATTRIBUTE = "class";
+
+    public static final String SCOPE_ATTRIBUTE = "scope";
+    /**
+     * 类属性
+     */
+    public static final String CLASS_PROPERTY = "property";
+
+    public static final String NAME_ATTRIBUTE = "name";
+    public static final String VALUE_ATTRIBUTE = "value";
+    public static final String REF_ATTRIBUTE = "ref";
 }

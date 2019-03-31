@@ -2,7 +2,7 @@ package spring.road.beans.exception;
 
 /**
  * User: StringBuilderSun
- * Created by Shanghai on 2019/3/30.
+ * Created by Shanghai on 2019/3/31.
  */
 public class BeanDefinitionException extends BeansException {
 

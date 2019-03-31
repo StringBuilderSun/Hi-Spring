@@ -4,7 +4,8 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Created by Administrator on 2019/3/30.
+ * User: StringBuilderSun
+ * Created by Shanghai on 2019/3/31.
  */
 @Getter
 public class BeanCreateException extends BeansException {

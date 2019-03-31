@@ -1,19 +1,33 @@
 package spring.road.beans.support;
 
+import lombok.extern.slf4j.Slf4j;
 import spring.road.beans.config.ConfigurableBeanFactory;
+import spring.road.beans.config.PropertyValue;
+import spring.road.beans.config.RuntimeBeanNameReference;
+import spring.road.beans.config.TypedStringValue;
 import spring.road.beans.core.BeanFactory;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
+import spring.road.beans.definition.BeanDefinitionValueResolver;
 import spring.road.beans.exception.BeanCreateException;
 import spring.road.beans.utils.ClassUtils;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by Administrator on 2019/3/29.
+ * User: StringBuilderSun
+ * Created by Shanghai on 2019/3/31.
  */
-public class DefaultBeanFactory implements BeanDefinitionRegistry, ConfigurableBeanFactory, BeanFactory {
+@Slf4j
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanDefinitionRegistry, ConfigurableBeanFactory, BeanFactory {
     /**
      * beans 声明集合
      */
@@ -32,13 +46,66 @@ public class DefaultBeanFactory implements BeanDefinitionRegistry, ConfigurableB
     }
 
     public Object getBean(String beanId) {
-        //首先得到bean声明
-        BeanDefinition beanDefinition = getBeanDefinition(beanId);
+        BeanDefinition beanDefinition = beanDefinitionsMap.get(beanId);
+        if (beanDefinition.isSingleScope()) {
+            //如果是单例模式 先去查找单利容器里面是否存在
+            Object target = this.getSingleton(beanId);
+            if (target == null) {
+                target = createBean(beanDefinition);
+                this.registerSingleton(beanId, target);
+            }
+            return target;
+        }
+        return createBean(beanDefinition);
+    }
+
+    public Object createBean(BeanDefinition beanDefinition) {
+        Object bean = initBean(beanDefinition);
+        return populateBean(beanDefinition, bean);
+
+    }
+
+    /**
+     * 通过反射为bean实现注入
+     *
+     * @param beanDefinition
+     * @param bean
+     * @return
+     */
+    public Object populateBean(BeanDefinition beanDefinition, Object bean) {
+        List<PropertyValue> propertyValues = beanDefinition.getpropertyValueList();
+        if (propertyValues.size() == 0) {
+            return bean;
+        }
+        try {
+            BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
+            BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+            //获取类的所有属性
+            PropertyDescriptor[] propertyDesciptors = beanInfo.getPropertyDescriptors();
+            for (PropertyValue pv : propertyValues) {
+                for (PropertyDescriptor pd : propertyDesciptors) {
+                    if (pd.getName().equals(pv.getName())) {
+                        pd.getWriteMethod().invoke(bean, valueResolver.resolveValueIfNecessary(pv));
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new BeanCreateException("Failed to obtain BeanInfo for class [" + beanDefinition.getBeanClassName() + "]", ex);
+        }
+        return bean;
+    }
+
+    /**
+     * 初始化bean 通过反射加载出一个bean实例
+     *
+     * @param beanDefinition
+     * @return
+     */
+    public Object initBean(BeanDefinition beanDefinition) {
         if (beanDefinition == null) {
             return null;
         }
-
-        String beanName = beanDefinition.getClassName();
+        String beanName = beanDefinition.getBeanClassName();
         try {
             Class<?> objectBean = getClassLoader().loadClass(beanName);
             return objectBean.newInstance();

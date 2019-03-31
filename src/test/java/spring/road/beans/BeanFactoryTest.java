@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.exception.BeanDefinitionException;
+import spring.road.beans.models.BeanService;
 import spring.road.beans.support.DefaultBeanFactory;
 import spring.road.context.factory.XmlBeanDefaultReader;
 import spring.road.context.io.ClassPathResource;
@@ -27,7 +28,7 @@ public class BeanFactoryTest {
     public void beanFacturyTest() {
         reader.loadBeanDifinitions(new ClassPathResource("spring/spring-context.xml"));
         BeanDefinition beanDefinition = factory.getBeanDefinition("beanService");
-        Assert.assertEquals("spring.road.beans.BeanService", beanDefinition.getClassName());
+        Assert.assertEquals("spring.road.beans.models.BeanService", beanDefinition.getBeanClassName());
         BeanService beanService = (BeanService) factory.getBean("beanService");
         Assert.assertNotNull(beanService);
 

@@ -4,5 +4,5 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="beanService" class="spring.road.beans.BeanService"/>
+    <bean id="beanService" class="spring.road.beans.models.BeanService"/>
 </beans>

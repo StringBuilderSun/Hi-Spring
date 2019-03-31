@@ -10,7 +10,8 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
         {BeanFactoryTest.class,
-                ResourceTest.class,ApplicationConetxTest.class
+                ResourceTest.class, ApplicationConetxTest.class
+                , SingleBeanFactoryTest.class, PropertieySetTest.class
         }
 )
 public class HiSpringTest {
