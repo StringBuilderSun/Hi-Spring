@@ -1,4 +1,4 @@
-package spring.road.beans.definition;
+package spring.road.beans.support;
 
 import spring.road.beans.config.PropertyValue;
 import spring.road.beans.config.RuntimeBeanNameReference;
@@ -24,7 +24,7 @@ public class BeanDefinitionValueResolver {
      * @param propertyValue
      * @return
      */
-    public Object resolveValueIfNecessary(PropertyValue propertyValue) {
+    public Object resolveValueIfNecessary(PropertyValue propertyValue, Class<?> requireType) {
         Object beanClass = propertyValue.getValue();
         if (beanClass instanceof RuntimeBeanNameReference) {
             RuntimeBeanNameReference reference = (RuntimeBeanNameReference) beanClass;
@@ -35,6 +35,9 @@ public class BeanDefinitionValueResolver {
             TypedStringValue typedStringValue = (TypedStringValue) beanClass;
             beanClass = typedStringValue.getValue();
         }
+        //属性值是否需要被转换
+        SimpleTypeConverter typeConverter = new SimpleTypeConverter();
+        beanClass = typeConverter.convertIfNecessary(beanClass, requireType);
         propertyValue.setConvertedValue(beanClass);
         return beanClass;
     }

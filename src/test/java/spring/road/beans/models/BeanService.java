@@ -11,5 +11,6 @@ import lombok.Setter;
 public class BeanService {
     private UserDao mapper;
     private String name;
+    private boolean sex;
 
 }

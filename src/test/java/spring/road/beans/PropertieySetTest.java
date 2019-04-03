@@ -17,5 +17,6 @@ public class PropertieySetTest {
         BeanService beanService = (BeanService) applicationContext.getBean("beanService");
         Assert.assertNotNull(beanService.getMapper());
         Assert.assertEquals("lijinpeng", beanService.getName());
+        Assert.assertEquals(false, beanService.isSex());
     }
 }

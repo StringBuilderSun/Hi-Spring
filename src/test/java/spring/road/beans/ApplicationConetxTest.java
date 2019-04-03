@@ -16,11 +16,11 @@ public class ApplicationConetxTest {
         Object bean = context.getBean("beanService");
         Assert.assertEquals("BeanService",bean.getClass().getSimpleName());
     }
-    @Test
-    public void fileSystemXmlApplicationContext()
-    {
-        FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext("D:\\ProjectWorkSpace\\Hi-Spring\\src\\main\\resources\\spring\\spring-context.xml");
-        Object bean = context.getBean("beanService");
-        Assert.assertEquals("BeanService",bean.getClass().getSimpleName());
-    }
+//    @Test
+//    public void fileSystemXmlApplicationContext()
+//    {
+//        FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext("D:\\ProjectWorkSpace\\Hi-Spring\\src\\main\\resources\\spring\\spring-context.xml");
+//        Object bean = context.getBean("beanService");
+//        Assert.assertEquals("BeanService",bean.getClass().getSimpleName());
+//    }
 }
