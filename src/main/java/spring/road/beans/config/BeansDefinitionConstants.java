@@ -18,4 +18,6 @@ public class BeansDefinitionConstants {
     public static final String NAME_ATTRIBUTE = "name";
     public static final String VALUE_ATTRIBUTE = "value";
     public static final String REF_ATTRIBUTE = "ref";
+    //构造函数
+    public static final String CONSTRUCTOR_ARG_ELEMENT = "constructor-arg";
 }

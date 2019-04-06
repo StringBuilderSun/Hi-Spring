@@ -3,6 +3,7 @@ package spring.road.beans.definition;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import spring.road.beans.config.BeanScopConstant;
+import spring.road.beans.config.ConstructorArgument;
 import spring.road.beans.config.PropertyValue;
 
 import java.util.ArrayList;
@@ -17,7 +18,10 @@ public class GenericBeanDefinition implements BeanDefinition {
     private String beanName;
     private String beanClass;
     private String scope = BeanScopConstant.SINGLETON_SCOPE;
-    List<PropertyValue> propertyValueList;
+    //属性集合
+    List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
+    //构造器
+    ConstructorArgument constructorArgument = new ConstructorArgument();
     /**
      * 默认是单例模式
      */
@@ -55,6 +59,14 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public List<PropertyValue> getpropertyValueList() {
         return propertyValueList;
+    }
+
+    public ConstructorArgument getConstructorArgument() {
+        return constructorArgument;
+    }
+
+    public boolean hasConstructorArgumentValues() {
+        return !(constructorArgument.isEmpty());
     }
 
     public void setScope(String scope) {

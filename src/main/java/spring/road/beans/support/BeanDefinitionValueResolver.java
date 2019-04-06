@@ -21,25 +21,23 @@ public class BeanDefinitionValueResolver {
     /**
      * 将声明阶段的beanDefinition里面的属性转换成对应真实属性
      *
-     * @param propertyValue
+     * @param value
      * @return
      */
-    public Object resolveValueIfNecessary(PropertyValue propertyValue, Class<?> requireType) {
-        Object beanClass = propertyValue.getValue();
-        if (beanClass instanceof RuntimeBeanNameReference) {
-            RuntimeBeanNameReference reference = (RuntimeBeanNameReference) beanClass;
-            beanClass = beanFactory.getBean(reference.getBeanName());
-            reference.setSource(beanClass);
-        } else if (beanClass instanceof TypedStringValue) {
+    public Object resolveValueIfNecessary(Object value, Class<?> requireType) {
+        if (value instanceof RuntimeBeanNameReference) {
+            RuntimeBeanNameReference reference = (RuntimeBeanNameReference) value;
+            value = beanFactory.getBean(reference.getBeanName());
+            reference.setSource(value);
+        } else if (value instanceof TypedStringValue) {
             //如果是String 无需做操作 需要实现类型转换哦
-            TypedStringValue typedStringValue = (TypedStringValue) beanClass;
-            beanClass = typedStringValue.getValue();
+            TypedStringValue typedStringValue = (TypedStringValue) value;
+            value = typedStringValue.getValue();
         }
         //属性值是否需要被转换
         SimpleTypeConverter typeConverter = new SimpleTypeConverter();
-        beanClass = typeConverter.convertIfNecessary(beanClass, requireType);
-        propertyValue.setConvertedValue(beanClass);
-        return beanClass;
+        value = typeConverter.convertIfNecessary(value, requireType);
+        return value;
     }
 
 }

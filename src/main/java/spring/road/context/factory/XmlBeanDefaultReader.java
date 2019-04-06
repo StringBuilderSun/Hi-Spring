@@ -1,5 +1,6 @@
 package spring.road.context.factory;
 
+import javafx.beans.binding.ObjectExpression;
 import jdk.nashorn.internal.objects.NativeUint8Array;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -8,10 +9,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import spring.road.beans.config.BeansDefinitionConstants;
-import spring.road.beans.config.PropertyValue;
-import spring.road.beans.config.RuntimeBeanNameReference;
-import spring.road.beans.config.TypedStringValue;
+import spring.road.beans.config.*;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
 import spring.road.beans.definition.GenericBeanDefinition;
@@ -58,6 +56,9 @@ public class XmlBeanDefaultReader {
                 if (nextEle.attributeValue(BeansDefinitionConstants.SCOPE_ATTRIBUTE) != null) {
                     beanDefinition.setScope(nextEle.attributeValue(BeansDefinitionConstants.SCOPE_ATTRIBUTE));
                 }
+                //解析构造函数 并进行值转换
+                parseConstructorArgElements(nextEle, beanDefinition);
+                //解析属性值   并进行值转换
                 parsePropertyElement(nextEle, beanDefinition);
                 registry.beanDefinationRegister(beanName, beanDefinition);
             }
@@ -66,6 +67,35 @@ public class XmlBeanDefaultReader {
         } finally {
             IOUtils.closeQuietly(is);
         }
+    }
+
+    /**
+     * 获取bean声明的constructor-arg 属性
+     *
+     * @param nextEle
+     * @param beanDefinition
+     */
+    private void parseConstructorArgElements(Element nextEle, BeanDefinition beanDefinition) {
+        //获取当前元素下 通过迭代 获取所有 构造参数并进行转换
+        Iterator<Element> iterator = nextEle.elementIterator(BeansDefinitionConstants.CONSTRUCTOR_ARG_ELEMENT);
+        while (iterator.hasNext()) {
+            Element element = iterator.next();
+            parseConstructorArgElement(element, beanDefinition);
+        }
+    }
+
+    /**
+     * 解析构造参数  放入 构造参数类中
+     *
+     * @param ele
+     * @param bd
+     */
+    public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+        String name = ele.attributeValue(BeansDefinitionConstants.NAME_ATTRIBUTE);
+        //获取构造参数属性值 并转成对应 运行时中间数据类型
+        Object value = parseEleValue(ele);
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(name, value);
+        bd.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
     /**

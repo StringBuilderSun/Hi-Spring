@@ -1,5 +1,6 @@
 package spring.road.beans.definition;
 
+import spring.road.beans.config.ConstructorArgument;
 import spring.road.beans.config.PropertyValue;
 
 import java.util.List;
@@ -44,5 +45,15 @@ public interface BeanDefinition {
      */
     String getScope();
 
+    /**
+     * 获取bean定义的属性文件
+     *
+     * @return
+     */
     List<PropertyValue> getpropertyValueList();
+
+    ConstructorArgument getConstructorArgument();
+
+    boolean hasConstructorArgumentValues();
+
 }

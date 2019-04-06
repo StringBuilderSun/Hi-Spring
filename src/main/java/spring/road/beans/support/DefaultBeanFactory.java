@@ -54,7 +54,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     }
 
     public Object createBean(BeanDefinition beanDefinition) {
-        Object bean = initBean(beanDefinition);
+        Object bean = instantiateBean(beanDefinition);
         return populateBean(beanDefinition, bean);
 
     }
@@ -80,7 +80,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
             for (PropertyValue pv : propertyValues) {
                 for (PropertyDescriptor pd : propertyDesciptors) {
                     if (pd.getName().equals(pv.getName())) {
-                        pd.getWriteMethod().invoke(bean, valueResolver.resolveValueIfNecessary(pv, pd.getPropertyType()));
+                        Object value = pv.getValue();
+                        pd.getWriteMethod().invoke(bean, valueResolver.resolveValueIfNecessary(value, pd.getPropertyType()));
                     }
                 }
             }
@@ -96,16 +97,22 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
      * @param beanDefinition
      * @return
      */
-    public Object initBean(BeanDefinition beanDefinition) {
+    public Object instantiateBean(BeanDefinition beanDefinition) {
         if (beanDefinition == null) {
             return null;
         }
-        String beanName = beanDefinition.getBeanClassName();
-        try {
-            Class<?> objectBean = getClassLoader().loadClass(beanName);
-            return objectBean.newInstance();
-        } catch (Exception e) {
-            throw new BeanCreateException(beanName, e.getMessage(), e);
+        //初始化一个构造函数解析器 用来返回初始化后的bean实例
+        if (beanDefinition.hasConstructorArgumentValues()) {
+            ConstructorResolver resolver = new ConstructorResolver(this);
+            return resolver.autowireConstructor(beanDefinition);
+        } else {
+            String beanName = beanDefinition.getBeanClassName();
+            try {
+                Class<?> objectBean = getClassLoader().loadClass(beanName);
+                return objectBean.newInstance();
+            } catch (Exception e) {
+                throw new BeanCreateException(beanName, e.getMessage(), e);
+            }
         }
     }
 
