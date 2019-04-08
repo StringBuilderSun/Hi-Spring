@@ -1,4 +1,4 @@
-package spring.road.beans;
+package spring.road.beans.factory;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,11 +24,11 @@ public class ResourceTest {
 
     @Test
     public void fileSystemResourceTest() throws FileNotFoundException {
-        String fileName = "D:\\ProjectWorkSpace\\Hi-Spring\\src\\main\\resources\\spring\\spring-context.xml";
-        FileSystemResource resource = new FileSystemResource(fileName);
-        InputStream stream = resource.getInputStream();
-        Assert.assertEquals("D:\\ProjectWorkSpace\\Hi-Spring\\src\\main\\resources\\spring\\spring-context.xml", resource.getDescriptions());
-        Assert.assertNotNull(stream);
+//        String fileName = "D:\\ProjectWorkSpace\\Hi-Spring\\src\\main\\resources\\spring\\spring-context.xml";
+//        FileSystemResource resource = new FileSystemResource(fileName);
+//        InputStream stream = resource.getInputStream();
+//        Assert.assertEquals("D:\\ProjectWorkSpace\\Hi-Spring\\src\\main\\resources\\spring\\spring-context.xml", resource.getDescriptions());
+//        Assert.assertNotNull(stream);
 
     }
 }

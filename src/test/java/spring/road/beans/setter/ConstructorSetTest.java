@@ -1,8 +1,9 @@
-package spring.road.beans.models;
+package spring.road.beans.setter;
 
 import javafx.beans.binding.ObjectExpression;
 import org.junit.Assert;
 import org.junit.Test;
+import spring.road.beans.models.Person;
 import spring.road.context.support.ClassPathXmlApplicationContext;
 
 /**

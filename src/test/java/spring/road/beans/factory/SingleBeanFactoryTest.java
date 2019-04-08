@@ -1,4 +1,4 @@
-package spring.road.beans;
+package spring.road.beans.factory;
 
 import org.junit.Assert;
 import org.junit.Test;
