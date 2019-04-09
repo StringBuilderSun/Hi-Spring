@@ -1,13 +1,12 @@
 package spring.road.beans.annotations;
 
-import com.sun.xml.internal.bind.v2.model.annotation.AnnotationReader;
 import org.junit.Assert;
 import org.junit.Test;
 import spring.road.context.io.ClassPathResource;
 import spring.road.core.type.AnnotationMetadata;
 import spring.road.core.type.ClassMetadata;
-import spring.road.core.type.classreading.MataDataReader;
-import spring.road.core.type.classreading.SimpleMataDataReader;
+import spring.road.core.type.classreading.MetaDataReader;
+import spring.road.core.type.classreading.SimpleMetaDataReader;
 
 import java.io.IOException;
 
@@ -19,7 +18,7 @@ public class SimpleAnnotationReaderTest {
     @Test
     public void AnnotationReaderTest() throws IOException {
         ClassPathResource resource = new ClassPathResource("spring/road/beans/models/scan/GameService.class");
-        MataDataReader reader = new SimpleMataDataReader(resource);
+        MetaDataReader reader = new SimpleMetaDataReader(resource);
         ClassMetadata classMetadata = reader.getClassMetadata();
         AnnotationMetadata annotationMetadata = reader.getAnnotationMetadata();
         Assert.assertEquals("spring.road.beans.models.scan.GameService", classMetadata.getClassName());

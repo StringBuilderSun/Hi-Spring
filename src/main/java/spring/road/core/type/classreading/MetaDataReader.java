@@ -8,7 +8,7 @@ import spring.road.core.type.ClassMetadata;
  * 对外提供 访问类的元数据接口
  * Created by lijinpeng on 2019/4/9.
  */
-public interface MataDataReader {
+public interface MetaDataReader {
     /**
      * 获取类的资源文件
      * @return

@@ -1,13 +1,9 @@
 package spring.road.context.factory;
 
-import com.sun.org.apache.regexp.internal.RE;
-import javafx.beans.binding.ObjectExpression;
-import jdk.nashorn.internal.objects.NativeUint8Array;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import spring.road.beans.config.*;
@@ -17,11 +13,12 @@ import spring.road.beans.definition.GenericBeanDefinition;
 import spring.road.beans.exception.BeanDefinitionException;
 import spring.road.beans.support.AnnotationBeanNameGenerator;
 import spring.road.beans.utils.ClassUtils;
+import spring.road.context.annotations.ClassPathBeanDefinitionScanner;
 import spring.road.context.annotations.ScannedGenericBeanDefinition;
 import spring.road.context.io.Resource;
 import spring.road.core.io.support.PackageResourceLoader;
-import spring.road.core.type.classreading.MataDataReader;
-import spring.road.core.type.classreading.SimpleMataDataReader;
+import spring.road.core.type.classreading.MetaDataReader;
+import spring.road.core.type.classreading.SimpleMetaDataReader;
 import spring.road.stereotype.Component;
 
 import java.io.IOException;
@@ -103,26 +100,8 @@ public class XmlBeanDefaultReader {
      */
     private void parseComponentElement(Element ele) {
         String location = ele.attributeValue(BeansDefinitionConstants.BASE_PACKAGE_ATTRIBUTE);
-        location = ClassUtils.convertClassNameToResourcePath(location);
-        String[] basePackages = StringUtils.split(location, ",");
-        for (int i = 0; i < basePackages.length; i++) {
-            PackageResourceLoader resourceLoader = new PackageResourceLoader();
-            Resource[] resources = resourceLoader.getResources(basePackages[i]);
-            for (Resource resource : resources) {
-                try {
-                    MataDataReader reader = new SimpleMataDataReader(resource);
-                    if (reader.getAnnotationMetadata().hasAnnotation(Component.class.getName())) {
-                        ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(reader.getAnnotationMetadata());
-                        AnnotationBeanNameGenerator nameGenerator = new AnnotationBeanNameGenerator();
-                        String beanName = nameGenerator.generateBeanName(sbd, registry);
-                        sbd.setBeanName(beanName);
-                        registry.beanDefinationRegister(beanName, sbd);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(registry);
+        scanner.doScan(location);
     }
 
     /**

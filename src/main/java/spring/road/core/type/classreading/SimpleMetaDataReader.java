@@ -14,7 +14,7 @@ import java.io.*;
  * Created by lijinpeng on 2019/4/9.
  */
 @Slf4j
-public class SimpleMataDataReader implements MataDataReader {
+public class SimpleMetaDataReader implements MetaDataReader {
     /**
      * 类的字节码文件
      */
@@ -34,7 +34,7 @@ public class SimpleMataDataReader implements MataDataReader {
      * @param resource
      * @throws IOException
      */
-    public SimpleMataDataReader(Resource resource) throws IOException {
+    public SimpleMetaDataReader(Resource resource) throws IOException {
         InputStream inputStream = null;
         try {
             inputStream = new BufferedInputStream(resource.getInputStream());
