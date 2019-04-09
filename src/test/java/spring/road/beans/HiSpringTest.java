@@ -2,10 +2,12 @@ package spring.road.beans;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import spring.road.beans.annotations.AnnotationBeanDefinedTest;
 import spring.road.beans.annotations.AnnotationClassMetaTest;
+import spring.road.beans.annotations.SimpleAnnotationReaderTest;
 import spring.road.beans.factory.ApplicationConetxTest;
 import spring.road.beans.factory.BeanFactoryTest;
-import spring.road.beans.factory.ResourceTest;
+import spring.road.beans.ResourceTest.ResourceTest;
 import spring.road.beans.factory.SingleBeanFactoryTest;
 import spring.road.beans.setter.ConstructorSetTest;
 import spring.road.beans.setter.PropertieySetTest;
@@ -19,7 +21,8 @@ import spring.road.beans.setter.PropertieySetTest;
         {BeanFactoryTest.class,
                 ResourceTest.class, ApplicationConetxTest.class
                 , SingleBeanFactoryTest.class, PropertieySetTest.class
-                ,ConstructorSetTest.class, AnnotationClassMetaTest.class
+                , ConstructorSetTest.class, AnnotationClassMetaTest.class,
+                SimpleAnnotationReaderTest.class, AnnotationBeanDefinedTest.class
         }
 )
 public class HiSpringTest {

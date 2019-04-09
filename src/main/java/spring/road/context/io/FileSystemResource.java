@@ -11,6 +11,12 @@ import java.io.InputStream;
  */
 public class FileSystemResource implements Resource {
     private File file;
+    private String path;
+
+    public FileSystemResource(File file) {
+        this.file = file;
+        this.path = file.getPath();
+    }
 
     public FileSystemResource(String configPath) {
         file = new File(configPath);
@@ -21,6 +27,6 @@ public class FileSystemResource implements Resource {
     }
 
     public String getDescriptions() {
-        return  file.getAbsolutePath();
+        return file.getAbsolutePath();
     }
 }

@@ -4,7 +4,7 @@ package spring.road.beans.definition;
  * User: StringBuilderSun
  * Created by Shanghai on 2019/3/30.
  */
-public interface BeanDefinitionRegistry {
+public interface BeanDefinitionRegistry  {
     /**
      * 获取bean声明
      * @param beanName

@@ -1,5 +1,6 @@
 package spring.road.context.factory;
 
+import com.sun.org.apache.regexp.internal.RE;
 import javafx.beans.binding.ObjectExpression;
 import jdk.nashorn.internal.objects.NativeUint8Array;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,16 @@ import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
 import spring.road.beans.definition.GenericBeanDefinition;
 import spring.road.beans.exception.BeanDefinitionException;
+import spring.road.beans.support.AnnotationBeanNameGenerator;
+import spring.road.beans.utils.ClassUtils;
+import spring.road.context.annotations.ScannedGenericBeanDefinition;
 import spring.road.context.io.Resource;
+import spring.road.core.io.support.PackageResourceLoader;
+import spring.road.core.type.classreading.MataDataReader;
+import spring.road.core.type.classreading.SimpleMataDataReader;
+import spring.road.stereotype.Component;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
@@ -47,25 +56,72 @@ public class XmlBeanDefaultReader {
             Iterator<Element> elements = root.elementIterator();
             while (elements.hasNext()) {
                 Element nextEle = elements.next();
-                //获取bean的name
-                String beanName = nextEle.attributeValue(BeansDefinitionConstants.ID_ATTRIBUTE);
-                //获取className
-                String className = nextEle.attributeValue(BeansDefinitionConstants.CLASS_ATTRIBUTE);
-                BeanDefinition beanDefinition = new GenericBeanDefinition(beanName, className);
-                //设置类的作用域
-                if (nextEle.attributeValue(BeansDefinitionConstants.SCOPE_ATTRIBUTE) != null) {
-                    beanDefinition.setScope(nextEle.attributeValue(BeansDefinitionConstants.SCOPE_ATTRIBUTE));
-                }
-                //解析构造函数 并进行值转换
-                parseConstructorArgElements(nextEle, beanDefinition);
-                //解析属性值   并进行值转换
-                parsePropertyElement(nextEle, beanDefinition);
-                registry.beanDefinationRegister(beanName, beanDefinition);
+                //获取元素的命名空间
+                String namespaceURI = nextEle.getNamespaceURI();
+                if (this.isDefaultNamespace(namespaceURI)) {
+                    parseDefaultElement(nextEle);//加载<bean></bean>
+                } else if (BeansDefinitionConstants.CONTEXT_NAMESPACE_URI.equals(namespaceURI))
+                    parseComponentElement(nextEle); //例如<context:component-scan>
             }
         } catch (Exception e) {
             throw new BeanDefinitionException("Create beanDefinition Fail!", e);
         } finally {
             IOUtils.closeQuietly(is);
+        }
+    }
+
+    public boolean isDefaultNamespace(String namespaceUri) {
+        return (StringUtils.isEmpty(namespaceUri) || BeansDefinitionConstants.BEANS_NAMESPACE_URI.equals(namespaceUri));
+    }
+
+    /**
+     * 当使用xml 的<bean><bean/>配置时由它处理
+     *
+     * @param ele
+     */
+    private void parseDefaultElement(Element ele) {
+        //获取bean的name
+        String beanName = ele.attributeValue(BeansDefinitionConstants.ID_ATTRIBUTE);
+        //获取className
+        String className = ele.attributeValue(BeansDefinitionConstants.CLASS_ATTRIBUTE);
+        BeanDefinition beanDefinition = new GenericBeanDefinition(beanName, className);
+        //设置类的作用域
+        if (ele.attributeValue(BeansDefinitionConstants.SCOPE_ATTRIBUTE) != null) {
+            beanDefinition.setScope(ele.attributeValue(BeansDefinitionConstants.SCOPE_ATTRIBUTE));
+        }
+        //解析构造函数 并进行值转换
+        parseConstructorArgElements(ele, beanDefinition);
+        //解析属性值   并进行值转换
+        parsePropertyElement(ele, beanDefinition);
+        registry.beanDefinationRegister(beanName, beanDefinition);
+    }
+
+    /**
+     * 当使用<context:component-scan> 时 由它处理
+     *
+     * @param ele
+     */
+    private void parseComponentElement(Element ele) {
+        String location = ele.attributeValue(BeansDefinitionConstants.BASE_PACKAGE_ATTRIBUTE);
+        location = ClassUtils.convertClassNameToResourcePath(location);
+        String[] basePackages = StringUtils.split(location, ",");
+        for (int i = 0; i < basePackages.length; i++) {
+            PackageResourceLoader resourceLoader = new PackageResourceLoader();
+            Resource[] resources = resourceLoader.getResources(basePackages[i]);
+            for (Resource resource : resources) {
+                try {
+                    MataDataReader reader = new SimpleMataDataReader(resource);
+                    if (reader.getAnnotationMetadata().hasAnnotation(Component.class.getName())) {
+                        ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(reader.getAnnotationMetadata());
+                        AnnotationBeanNameGenerator nameGenerator = new AnnotationBeanNameGenerator();
+                        String beanName = nameGenerator.generateBeanName(sbd, registry);
+                        sbd.setBeanName(beanName);
+                        registry.beanDefinationRegister(beanName, sbd);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

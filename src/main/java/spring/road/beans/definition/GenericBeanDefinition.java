@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 public class GenericBeanDefinition implements BeanDefinition {
     private String beanName;
-    private String beanClass;
+    private String beanClassName;
     private String scope = BeanScopConstant.SINGLETON_SCOPE;
     //属性集合
     List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
@@ -31,8 +31,11 @@ public class GenericBeanDefinition implements BeanDefinition {
      */
     private boolean prototype = false;
 
+    public GenericBeanDefinition() {
+    }
+
     public GenericBeanDefinition(String beanName, String beanClass) {
-        this.beanClass = beanClass;
+        this.beanClassName = beanClass;
         this.beanName = beanName;
         propertyValueList = new ArrayList<PropertyValue>();
     }
@@ -42,7 +45,11 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
     public String getBeanClassName() {
-        return beanClass;
+        return this.beanClassName;
+    }
+
+    public void setBeanClassName(String className) {
+        this.beanClassName = className;
     }
 
     public boolean isSingleScope() {

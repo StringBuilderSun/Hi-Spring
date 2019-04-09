@@ -24,6 +24,8 @@ public interface BeanDefinition {
      */
     String getBeanClassName();
 
+    void setBeanClassName(String className);
+
     /**
      * 设置类的作用域
      *
