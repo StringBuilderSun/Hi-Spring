@@ -1,4 +1,4 @@
-package spring.road.beans.core;
+package spring.road.beans.factory;
 
 /**
  * User: StringBuilderSun

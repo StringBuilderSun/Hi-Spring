@@ -17,6 +17,7 @@ import java.util.List;
 public class GenericBeanDefinition implements BeanDefinition {
     private String beanName;
     private String beanClassName;
+    private Class<?> beanClass;
     private String scope = BeanScopConstant.SINGLETON_SCOPE;
     //属性集合
     List<PropertyValue> propertyValueList = new ArrayList<PropertyValue>();
@@ -74,6 +75,25 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public boolean hasConstructorArgumentValues() {
         return !(constructorArgument.isEmpty());
+    }
+
+    public Class<?> getBeanClass() throws IllegalStateException {
+        if(this.beanClass == null){
+            throw new IllegalStateException(
+                    "Bean class name [" + this.getBeanClassName() + "] has not been resolved into an actual Class");
+        }
+        return this.beanClass;
+    }
+
+
+    public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
+        String beanClassName = this.getBeanClassName();
+        this.beanClass = classLoader.loadClass(beanClassName);
+        return this.beanClass;
+    }
+
+    public boolean hasBeanClass() {
+        return this.beanClass != null;
     }
 
     public void setScope(String scope) {

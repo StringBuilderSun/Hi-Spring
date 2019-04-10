@@ -54,8 +54,38 @@ public interface BeanDefinition {
      */
     List<PropertyValue> getpropertyValueList();
 
+    /**
+     * 获取构造函数声明
+     * @return
+     */
+
     ConstructorArgument getConstructorArgument();
 
+    /**
+     * bean声明里是否有配置了构造函数
+     * @return
+     */
     boolean hasConstructorArgumentValues();
+
+    /**
+     * 获取bean声明类的类的class对象
+     * @return
+     */
+     Class<?> getBeanClass() throws IllegalStateException ;
+
+    /**
+     * 加载bean声明里的类对象
+     * @param classLoader
+     * @return
+     * @throws ClassNotFoundException
+     */
+     Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
+
+    /**
+     * 判断类对象是否被加载过
+     * @return
+     */
+     boolean hasBeanClass();
+
 
 }

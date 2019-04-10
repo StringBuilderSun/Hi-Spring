@@ -1,9 +1,8 @@
 package spring.road.beans.support;
 
-import spring.road.beans.config.PropertyValue;
 import spring.road.beans.config.RuntimeBeanNameReference;
 import spring.road.beans.config.TypedStringValue;
-import spring.road.beans.core.BeanFactory;
+import spring.road.beans.factory.BeanFactory;
 
 /**
  * 属性值转换解析器

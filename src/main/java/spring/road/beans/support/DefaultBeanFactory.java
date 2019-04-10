@@ -2,8 +2,9 @@ package spring.road.beans.support;
 
 import lombok.extern.slf4j.Slf4j;
 import spring.road.beans.config.ConfigurableBeanFactory;
+import spring.road.beans.config.DependencyDescriptor;
 import spring.road.beans.config.PropertyValue;
-import spring.road.beans.core.BeanFactory;
+import spring.road.beans.factory.BeanFactory;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
 import spring.road.beans.exception.BeanCreateException;
@@ -12,6 +13,7 @@ import spring.road.beans.utils.ClassUtils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,6 +69,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
      * @return
      */
     public Object populateBean(BeanDefinition beanDefinition, Object bean) {
+        //使用扫描包的方式获取实例化bean 通过ScannedGenericBeanDefinition 初始化bean
+
         List<PropertyValue> propertyValues = beanDefinition.getpropertyValueList();
         if (propertyValues.size() == 0) {
             return bean;
@@ -122,5 +126,26 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
 
     public ClassLoader getClassLoader() {
         return classLoader != null ? classLoader : ClassUtils.getDefaultClassLoader();
+    }
+
+    /**
+     * 根据属性依赖描述符 从ICO中查找对应的bean完成注入
+     *
+     * @param descriptor
+     * @return
+     */
+    public Object resolveDependency(DependencyDescriptor descriptor) throws ClassNotFoundException {
+        Class<?> typeToMatch = descriptor.getDependencyType();
+        for (BeanDefinition bd : this.beanDefinitionsMap.values()) {
+            //确保类被加载过
+            if (!bd.hasBeanClass()) {
+                bd.resolveBeanClass(getClassLoader());
+            }
+            //在IOC里匹配的bean声明 能够被属性字段接收 （符合注入条件）
+            if (bd.getBeanClass().isAssignableFrom(typeToMatch)) {
+                return this.getBean(bd.getBeanName());
+            }
+        }
+        return null;
     }
 }
