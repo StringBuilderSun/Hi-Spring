@@ -7,4 +7,5 @@ import spring.road.stereotype.Component;
  */
 @Component(value = "roles")
 public class Roles {
+
 }

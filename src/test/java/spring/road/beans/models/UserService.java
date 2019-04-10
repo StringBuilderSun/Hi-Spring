@@ -1,6 +1,6 @@
 package spring.road.beans.models;
 
-import spring.road.beans.annation.AutoWired;
+import spring.road.beans.annation.Autowired;
 import spring.road.stereotype.Component;
 
 /**
@@ -9,7 +9,7 @@ import spring.road.stereotype.Component;
 
 @Component(value = "userService")
 public class UserService {
-    @AutoWired
+    @Autowired
     private Person person;
 
 }

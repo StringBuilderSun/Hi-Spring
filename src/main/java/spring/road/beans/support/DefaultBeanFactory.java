@@ -8,12 +8,14 @@ import spring.road.beans.factory.BeanFactory;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
 import spring.road.beans.exception.BeanCreateException;
+import spring.road.beans.postProcessor.BeanPostProcessor;
+import spring.road.beans.postProcessor.InstantiationAwareBeanPostProcessor;
 import spring.road.beans.utils.ClassUtils;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Type;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,10 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
      * 类加载器
      */
     private ClassLoader classLoader;
+    /**
+     * bean生命周期处理器
+     */
+    private LinkedList<BeanPostProcessor> beanPostProcessors = new LinkedList<BeanPostProcessor>();
 
     public BeanDefinition getBeanDefinition(String beanId) {
         return beanDefinitionsMap.get(beanId);
@@ -70,7 +76,12 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
      */
     public Object populateBean(BeanDefinition beanDefinition, Object bean) {
         //使用扫描包的方式获取实例化bean 通过ScannedGenericBeanDefinition 初始化bean
-
+        for (BeanPostProcessor postProcessor : beanPostProcessors) {
+            if (postProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                //通过注解的字段最终通过这个方法 被注入值
+                ((InstantiationAwareBeanPostProcessor) postProcessor).postProcessPropertyValues(bean, beanDefinition.getBeanName());
+            }
+        }
         List<PropertyValue> propertyValues = beanDefinition.getpropertyValueList();
         if (propertyValues.size() == 0) {
             return bean;
@@ -126,6 +137,14 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
 
     public ClassLoader getClassLoader() {
         return classLoader != null ? classLoader : ClassUtils.getDefaultClassLoader();
+    }
+
+    public void addBeanPostProcessor(BeanPostProcessor postProcessor) {
+        this.beanPostProcessors.add(postProcessor);
+    }
+
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
     }
 
     /**

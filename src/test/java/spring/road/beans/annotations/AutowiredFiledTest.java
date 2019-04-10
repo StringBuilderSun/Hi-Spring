@@ -14,6 +14,7 @@ import spring.road.context.support.ClassPathXmlApplicationContext;
 import java.lang.reflect.Field;
 
 /**
+ * 验证字段的自动赋值
  * Created by lijinpeng on 2019/4/10.
  */
 public class AutowiredFiledTest {
@@ -28,5 +29,6 @@ public class AutowiredFiledTest {
         AutowiredFieldElement fieldElement = new AutowiredFieldElement(field, true, beanFactory);
         fieldElement.inject(service);
         Assert.assertNotNull(service.getPerson());
+        Assert.assertEquals("dangwendi", service.getPerson().getName());
     }
 }

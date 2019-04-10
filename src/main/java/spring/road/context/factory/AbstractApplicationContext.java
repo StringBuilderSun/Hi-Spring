@@ -1,5 +1,7 @@
 package spring.road.context.factory;
 
+import spring.road.beans.config.ConfigurableBeanFactory;
+import spring.road.beans.postProcessor.AutowiredAnnotationProcessor;
 import spring.road.beans.support.DefaultBeanFactory;
 import spring.road.beans.utils.ClassUtils;
 import spring.road.context.core.ApplicationContext;
@@ -18,6 +20,7 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         XmlBeanDefaultReader reader = new XmlBeanDefaultReader(beanFactory);
         Resource resource = this.getResource(configPath);
         reader.loadBeanDifinitions(resource);
+        registerBeanPostProcessors(beanFactory);
     }
 
     /**
@@ -44,5 +47,17 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
 
     public ClassLoader getClassLoader() {
         return classLoader != null ? classLoader : ClassUtils.getDefaultClassLoader();
+    }
+
+    /**
+     * 注册PostProcessor处理器  genBean()时候执行
+     *
+     * @param beanFactory
+     */
+    protected void registerBeanPostProcessors(ConfigurableBeanFactory beanFactory) {
+        AutowiredAnnotationProcessor postProcessor = new AutowiredAnnotationProcessor();
+        postProcessor.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(postProcessor);
+
     }
 }
