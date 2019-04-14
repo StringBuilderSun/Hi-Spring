@@ -22,7 +22,7 @@ public class SimpleAnnotationReaderTest {
         ClassMetadata classMetadata = reader.getClassMetadata();
         AnnotationMetadata annotationMetadata = reader.getAnnotationMetadata();
         Assert.assertEquals("spring.road.beans.models.scan.GameService", classMetadata.getClassName());
-        Assert.assertEquals("java.lang.Object", classMetadata.getSuperClassName());
+        Assert.assertEquals("spring.road.beans.models.scan.impl.Boss", classMetadata.getSuperClassName());
         Assert.assertFalse(classMetadata.isAbstract());
         Assert.assertFalse(classMetadata.isFinal());
         Assert.assertFalse(classMetadata.isInterface());

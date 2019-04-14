@@ -10,16 +10,11 @@ import java.util.List;
  */
 public class InjectionMetadata {
     /**
-     * 要注入属性值的目标类
-     */
-    private Class<?> target;
-    /**
      * 目标类需要注入的属性集合 由其自身完成注册功能
      */
     private List<InjectionElement> injectionElements;
 
-    public InjectionMetadata(Class<?> target, List<InjectionElement> injectionElements) {
-        this.target = target;
+    public InjectionMetadata(List<InjectionElement> injectionElements) {
         this.injectionElements = injectionElements;
     }
 
@@ -27,7 +22,7 @@ public class InjectionMetadata {
         return this.injectionElements;
     }
 
-    public void inject() {
+    public void inject(Object target) {
         if (injectionElements != null && injectionElements.size() > 0) {
             for (InjectionElement element : injectionElements) {
                 element.inject(target);

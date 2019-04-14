@@ -36,7 +36,7 @@ public class AnnotationClassMetaTest {
         ClassMetadataReadingVisitor visitor = new ClassMetadataReadingVisitor();
         reader.accept(visitor, ClassReader.SKIP_DEBUG);
         Assert.assertEquals("spring.road.beans.models.scan.GameService", visitor.getClassName());
-        Assert.assertEquals("java.lang.Object", visitor.getSuperClassName());
+        Assert.assertEquals("spring.road.beans.models.scan.impl.Boss", visitor.getSuperClassName());
         Assert.assertFalse(visitor.isAbstract());
         Assert.assertFalse(visitor.isFinal());
         Assert.assertFalse(visitor.isInterface());

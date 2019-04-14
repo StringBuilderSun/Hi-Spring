@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import spring.road.beans.models.BeanService;
 import spring.road.beans.models.Person;
+import spring.road.beans.models.scan.GameService;
 import spring.road.beans.models.scan.impl.Boss;
 import spring.road.context.support.ClassPathXmlApplicationContext;
 
@@ -16,10 +17,11 @@ public class AutowireAllFinishTest {
     @Test
     public void autowireAllFinishTest() {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring/spring-context.xml");
-        Person person = (Person) applicationContext.getBean("person");
-        Assert.assertEquals("dangwendi", person.getName());
-//        Boss boss = (Boss) applicationContext.getBean("boss");
-//        Assert.assertNotNull(boss);
-//        Assert.assertTrue(boss.getBeanService() instanceof BeanService);
+        GameService gameService = (GameService) applicationContext.getBean("gameService");
+        Assert.assertEquals("dangwendi", gameService.getPerson().getName());
+        BeanService beanService=gameService.getBeanService();
+        Assert.assertNotNull(beanService);
+        Assert.assertTrue(!beanService.isSex());
+        Assert.assertEquals("lijinpeng",beanService.getName());
     }
 }

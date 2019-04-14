@@ -72,7 +72,7 @@ public class AutowiredAnnotationProcessor implements InstantiationAwareBeanPostP
         Class<?> target = bean.getClass();
         InjectionMetadata metadata = buildAutowiringMetadata(target);
         try {
-            metadata.inject();
+            metadata.inject(bean);
         } catch (Throwable ex) {
             throw new BeanCreateException(beanName, "Injection of autowired dependencies failed", ex);
         }
@@ -95,13 +95,12 @@ public class AutowiredAnnotationProcessor implements InstantiationAwareBeanPostP
      * @return
      */
     private InjectionMetadata buildAutowiringMetadata(Class<?> target) {
-        Class<?> clazz=target;
-        Field[] fields = clazz.getDeclaredFields();
+        Class<?> clazz = target;
         LinkedList<InjectionElement> elements = new LinkedList<InjectionElement>();
         //循环查找父类 属性是否使用了注解  依次添加到集合
         do {
             LinkedList<InjectionElement> currEles = new LinkedList<InjectionElement>();
-            for (Field field : fields) {
+            for (Field field : clazz.getDeclaredFields()) {
                 //存在该注解
                 Annotation an = findAutowiredAnnotation(field);
                 if (an != null) {
@@ -120,7 +119,7 @@ public class AutowiredAnnotationProcessor implements InstantiationAwareBeanPostP
             elements.addAll(0, currEles);
             clazz = clazz.getSuperclass();
         } while (clazz != null && clazz != Object.class);
-        return new InjectionMetadata(target, elements);
+        return new InjectionMetadata(elements);
     }
 
     /**
