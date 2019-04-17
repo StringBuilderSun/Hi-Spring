@@ -51,7 +51,12 @@
             <artifactId>spring-asm</artifactId>
             <version>3.1.4.RELEASE</version>
         </dependency>
-
+        <!--导入aspectj的包-->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.8.13</version>
+        </dependency>
     </dependencies>
 
 </project>
