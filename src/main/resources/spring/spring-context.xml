@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-         http://www.springframework.org/schema/beans/spring-beans.xsd
-         http://www.springframework.org/schema/context
-         http://www.springframework.org/schema/context/spring-context.xsd">
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd">
 
     <bean id="beanService" class="spring.road.beans.models.BeanService">
         <property name="mapper" ref="userDao"/>
@@ -20,4 +21,17 @@
         <constructor-arg name="sex" value="true"/>
     </bean>
     <context:component-scan base-package="spring.road.beans.models"/>
+
+    <bean id="tx" class="spring.road.beans.models.aop.TransactionManager" />
+
+    <aop:config>
+        <aop:aspect ref="tx">
+            <aop:pointcut id="games"
+                          expression="execution(* spring.road.beans.models.scan.*.playGames(..))" />
+            <aop:before pointcut-ref="games" method="start" />
+            <aop:after-returning pointcut-ref="games"	method="commit" />
+            <aop:after-throwing pointcut-ref="games" method = "rollback"/>
+        </aop:aspect>
+    </aop:config>
+
 </beans>

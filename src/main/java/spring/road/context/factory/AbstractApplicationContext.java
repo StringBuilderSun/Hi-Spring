@@ -1,6 +1,7 @@
 package spring.road.context.factory;
 
 import spring.road.beans.config.ConfigurableBeanFactory;
+import spring.road.beans.exception.NoSuchBeanDefinitionException;
 import spring.road.beans.postProcessor.AutowiredAnnotationProcessor;
 import spring.road.beans.support.DefaultBeanFactory;
 import spring.road.beans.utils.ClassUtils;
@@ -31,6 +32,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      */
     public Object getBean(String beanId) {
         return beanFactory.getBean(beanId);
+    }
+
+    public Class<?> getType(String name) throws NoSuchBeanDefinitionException, ClassNotFoundException {
+        return beanFactory.getType(name);
     }
 
     /**

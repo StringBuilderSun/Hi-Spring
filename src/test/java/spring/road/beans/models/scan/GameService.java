@@ -20,7 +20,12 @@ public class GameService extends Boss {
         return person;
     }
 
-    public void playGames() {
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public void playGames() throws Exception {
         log.info("person-name:{} play games", person.getName());
+//        throw new Exception("test exception");
     }
 }

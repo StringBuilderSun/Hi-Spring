@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import spring.road.beans.config.ConfigurableBeanFactory;
 import spring.road.beans.config.DependencyDescriptor;
 import spring.road.beans.config.PropertyValue;
+import spring.road.beans.exception.NoSuchBeanDefinitionException;
 import spring.road.beans.factory.BeanFactory;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
@@ -59,6 +60,15 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
             return target;
         }
         return createBean(beanDefinition);
+    }
+
+    public Class<?> getType(String name) throws NoSuchBeanDefinitionException, ClassNotFoundException {
+        BeanDefinition bd = this.getBeanDefinition(name);
+        if(bd == null){
+            throw new NoSuchBeanDefinitionException(name);
+        }
+        bd.resolveBeanClass(getClassLoader());
+        return bd.getBeanClass();
     }
 
     public Object createBean(BeanDefinition beanDefinition) {
