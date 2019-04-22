@@ -38,7 +38,7 @@ public class MethodLocatingFactory {
         }
         //支持方法具有多个参数的功能
         this.method = BeanUtils.resolveSignature(this.methodName, beanClass);
-        if (this.method == null) {
+        if (method == null) {
             throw new IllegalArgumentException("Unable to locate method [" + this.methodName +
                     "] on bean [" + this.targetBeanName + "]");
         }
