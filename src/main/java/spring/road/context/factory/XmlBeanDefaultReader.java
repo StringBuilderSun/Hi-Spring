@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import spring.road.aop.config.ConfigBeanDefinitionParser;
 import spring.road.beans.config.*;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
@@ -57,14 +58,27 @@ public class XmlBeanDefaultReader {
                 String namespaceURI = nextEle.getNamespaceURI();
                 if (this.isDefaultNamespace(namespaceURI)) {
                     parseDefaultElement(nextEle);//加载<bean></bean>
-                } else if (BeansDefinitionConstants.CONTEXT_NAMESPACE_URI.equals(namespaceURI))
+                } else if (BeansDefinitionConstants.CONTEXT_NAMESPACE_URI.equals(namespaceURI)) {
                     parseComponentElement(nextEle); //例如<context:component-scan>
+                } else if (BeansDefinitionConstants.AOP_NAMESPACE_URI.equals(namespaceURI)) {
+                    parseAopElement(nextEle);
+                }
             }
         } catch (Exception e) {
             throw new BeanDefinitionException("Create beanDefinition Fail!", e);
         } finally {
             IOUtils.closeQuietly(is);
         }
+    }
+
+    /**
+     * 解析Aop:config标签
+     *
+     * @param nextEle
+     */
+    private void parseAopElement(Element nextEle) {
+        ConfigBeanDefinitionParser parser = new ConfigBeanDefinitionParser();
+        parser.parse(nextEle, registry);
     }
 
     public boolean isDefaultNamespace(String namespaceUri) {

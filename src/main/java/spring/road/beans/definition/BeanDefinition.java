@@ -56,6 +56,7 @@ public interface BeanDefinition {
 
     /**
      * 获取构造函数声明
+     *
      * @return
      */
 
@@ -63,29 +64,41 @@ public interface BeanDefinition {
 
     /**
      * bean声明里是否有配置了构造函数
+     *
      * @return
      */
     boolean hasConstructorArgumentValues();
 
     /**
      * 获取bean声明类的类的class对象
+     *
      * @return
      */
-     Class<?> getBeanClass() throws IllegalStateException ;
+    Class<?> getBeanClass() throws IllegalStateException;
 
     /**
      * 加载bean声明里的类对象
+     *
      * @param classLoader
      * @return
      * @throws ClassNotFoundException
      */
-     Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
+    Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
 
     /**
      * 判断类对象是否被加载过
+     *
      * @return
      */
-     boolean hasBeanClass();
+    boolean hasBeanClass();
+
+    /**
+     * 判断bean生命是否是合成的
+     * 主要用于BeanDefinitation的构造参数是另一个或多个BeanDefinitation
+     *
+     * @return
+     */
+    boolean isSynthetic();
 
 
 }

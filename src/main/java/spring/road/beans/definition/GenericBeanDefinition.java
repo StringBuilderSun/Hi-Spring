@@ -31,8 +31,18 @@ public class GenericBeanDefinition implements BeanDefinition {
      * 原型模式
      */
     private boolean prototype = false;
+    private boolean synthetic = false;
 
     public GenericBeanDefinition() {
+    }
+
+    /**
+     * 通过传入一个类对象创建一个beandefinition
+     * @param beanClass
+     */
+    public GenericBeanDefinition(Class<?> beanClass) {
+        this.beanClass = beanClass;
+        this.beanClassName = beanClass.getName();
     }
 
     public GenericBeanDefinition(String beanName, String beanClass) {
@@ -78,7 +88,7 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
     public Class<?> getBeanClass() throws IllegalStateException {
-        if(this.beanClass == null){
+        if (this.beanClass == null) {
             throw new IllegalStateException(
                     "Bean class name [" + this.getBeanClassName() + "] has not been resolved into an actual Class");
         }
@@ -94,6 +104,10 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     public boolean hasBeanClass() {
         return this.beanClass != null;
+    }
+
+    public boolean isSynthetic() {
+        return this.synthetic;
     }
 
     public void setScope(String scope) {
