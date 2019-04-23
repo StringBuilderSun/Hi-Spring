@@ -46,7 +46,13 @@ public class BeanDefinitionReaderUtils {
         return generateBeanName(beanDefinition, registry, false);
     }
 
-
+    /**
+     * 为bean创建一个beanName 并注入到IOC bean声明中
+     *
+     * @param definition
+     * @param registry
+     * @return
+     */
     public static String registerWithGeneratedName(GenericBeanDefinition definition, BeanDefinitionRegistry registry) {
         String generatedName = generateBeanName(definition, registry, false);
         registry.beanDefinationRegister(generatedName, definition);

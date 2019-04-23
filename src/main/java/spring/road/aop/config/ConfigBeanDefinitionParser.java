@@ -2,6 +2,12 @@ package spring.road.aop.config;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
+import spring.road.aop.aspectj.AspectJAfterReturningAdvise;
+import spring.road.aop.aspectj.AspectJAfterThrowingAdvise;
+import spring.road.aop.aspectj.AspectJBeforeAdvise;
+import spring.road.aop.aspectj.AspectJExpressionPointcut;
+import spring.road.beans.config.BeansDefinitionConstants;
+import spring.road.beans.config.ConstructorArgument;
 import spring.road.beans.config.PropertyValue;
 import spring.road.beans.config.RuntimeBeanNameReference;
 import spring.road.beans.definition.BeanDefinition;
@@ -72,6 +78,7 @@ public class ConfigBeanDefinitionParser {
         for (int i = 0; i < aopAspectElements.size(); i++) {
             Element element = aopAspectElements.get(i);
             if (isAdviceNode(element)) {
+
                 //1、如果是aop:before   aop:after-returning 这样的切面方法 生成 beandefinition
                 if (!adviceFoundAlready) {
                     //未被加载过 才会加载
@@ -95,34 +102,51 @@ public class ConfigBeanDefinitionParser {
      * @param aspectName      切面方法 before  after-returning 等 用来生成切面类
      * @param order           切面类编号
      * @param aspectElement   切面类元素
-     * @param element         aop config
+     * @param adviseEle       aop befor  after-retruning等
      * @param registry        ICO注册
      * @param beanDefinitions bean声明
      * @param beanReferences
      * @return
      */
-    private GenericBeanDefinition parseAdvice(String aspectName, int order, Element aspectElement, Element element, BeanDefinitionRegistry registry, List<BeanDefinition> beanDefinitions, List<RuntimeBeanNameReference> beanReferences) {
+    private GenericBeanDefinition parseAdvice(String aspectName, int order, Element aspectElement, Element adviseEle, BeanDefinitionRegistry registry, List<BeanDefinition> beanDefinitions, List<RuntimeBeanNameReference> beanReferences) {
+        //切面方法类第一个参数  方法定位器
         GenericBeanDefinition methodDefinition = new GenericBeanDefinition(MethodLocatingFactory.class);
         methodDefinition.getpropertyValueList().add(new PropertyValue("targetBeanName", aspectName));
         methodDefinition.getpropertyValueList().add(new PropertyValue("methodName", aspectElement.attributeValue("method")));
         methodDefinition.setSynthetic(true);
 
-        // create instance factory definition
+        // 切面方法第三个参数   切面类对象
         GenericBeanDefinition aspectFactoryDef = new GenericBeanDefinition(AspectInstanceFactory.class);
         aspectFactoryDef.getpropertyValueList().add(new PropertyValue("aspectBeanName", aspectName));
         aspectFactoryDef.setSynthetic(true);
-        // register the pointcut
-        GenericBeanDefinition adviceDef = createAdviceDefinition(aspectElement, registry, aspectName, order, methodDefinition, aspectFactoryDef,
+        //切面方法第二个参数
+        GenericBeanDefinition adviceDef = createAdviceDefinition(adviseEle, registry, aspectName, order, methodDefinition, aspectFactoryDef,
                 beanDefinitions, beanReferences);
         adviceDef.setSynthetic(true);
-
-        // register the final advisor
+        //将aop 切面类 注入到IOC bean声明中
         BeanDefinitionReaderUtils.registerWithGeneratedName(adviceDef, registry);
         return adviceDef;
     }
 
-    private GenericBeanDefinition createAdviceDefinition(Element aspectElement, BeanDefinitionRegistry registry, String aspectName, int order, GenericBeanDefinition methodDefinition, GenericBeanDefinition aspectFactoryDef, List<BeanDefinition> beanDefinitions, List<RuntimeBeanNameReference> beanReferences) {
-        return null;
+    private GenericBeanDefinition createAdviceDefinition(Element adviseEle, BeanDefinitionRegistry registry, String aspectName, int order, GenericBeanDefinition methodDefinition, GenericBeanDefinition aspectFactoryDef, List<BeanDefinition> beanDefinitions, List<RuntimeBeanNameReference> beanReferences) {
+        GenericBeanDefinition adviceDefinition = new GenericBeanDefinition(getAdviceClass(adviseEle));
+        adviceDefinition.getpropertyValueList().add(new PropertyValue(ASPECT_NAME_PROPERTY, aspectName));
+
+        ConstructorArgument cav = adviceDefinition.getConstructorArgument();
+        cav.addArgumentValue(methodDefinition);
+        //创建第二个参数 pointCut
+        Object pointcut = parsePointcutProperty(adviseEle);
+        if (pointcut instanceof BeanDefinition) {
+            cav.addArgumentValue(pointcut);
+            beanDefinitions.add((BeanDefinition) pointcut);
+        } else if (pointcut instanceof String) {
+            RuntimeBeanNameReference pointcutRef = new RuntimeBeanNameReference((String) pointcut);
+            cav.addArgumentValue(pointcutRef);
+            beanReferences.add(pointcutRef);
+        }
+        cav.addArgumentValue(aspectFactoryDef);
+
+        return adviceDefinition;
     }
 
     private boolean isAdviceNode(Element element) {
@@ -131,4 +155,53 @@ public class ConfigBeanDefinitionParser {
                 AFTER_THROWING_ELEMENT.equals(name) || AROUND.equals(name));
     }
 
+    private Object parsePointcutProperty(Element element) {
+        if ((element.attribute(POINTCUT) == null) && (element.attribute(POINTCUT_REF) == null)) {
+            return null;
+        } else if (element.attribute(POINTCUT) != null) {
+            String expression = element.attributeValue(POINTCUT);
+            GenericBeanDefinition pointcutDefinition = createPointcutDefinition(expression);
+            return pointcutDefinition;
+        } else if (element.attribute(POINTCUT_REF) != null) {
+            String pointcutRef = element.attributeValue(POINTCUT_REF);
+            if (StringUtils.isEmpty(pointcutRef)) {
+                return null;
+            }
+            return pointcutRef;
+        }
+        return null;
+    }
+
+    /**
+     * 创建pointCut 的 BeanDefinition
+     *
+     * @param expression
+     * @return
+     */
+    private GenericBeanDefinition createPointcutDefinition(String expression) {
+        GenericBeanDefinition beanDefinition = new GenericBeanDefinition(AspectJExpressionPointcut.class);
+        beanDefinition.setScope(BeansDefinitionConstants.SCOPE_ATTRIBUTE);
+        beanDefinition.setSynthetic(true);
+        beanDefinition.getpropertyValueList().add(new PropertyValue(EXPRESSION, expression));
+        return beanDefinition;
+    }
+
+    /**
+     * 获取切面类
+     *
+     * @param adviceElement
+     * @return
+     */
+    private Class<?> getAdviceClass(Element adviceElement) {
+        String elementName = adviceElement.getName();
+        if (BEFORE.equals(elementName)) {
+            return AspectJBeforeAdvise.class;
+        } else if (AFTER_RETURNING_ELEMENT.equals(elementName)) {
+            return AspectJAfterReturningAdvise.class;
+        } else if (AFTER_THROWING_ELEMENT.equals(elementName)) {
+            return AspectJAfterThrowingAdvise.class;
+        } else {
+            throw new IllegalArgumentException("Unknown advice kind [" + elementName + "].");
+        }
+    }
 }
