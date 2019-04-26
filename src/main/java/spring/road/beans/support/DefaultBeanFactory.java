@@ -16,6 +16,7 @@ import spring.road.beans.utils.ClassUtils;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Shanghai on 2019/3/31.
  */
 @Slf4j
-public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanDefinitionRegistry, ConfigurableBeanFactory, BeanFactory {
+public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefinitionRegistry {
     /**
      * beans 声明集合
      */
@@ -40,8 +41,8 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
      */
     private LinkedList<BeanPostProcessor> beanPostProcessors = new LinkedList<BeanPostProcessor>();
 
-    public BeanDefinition getBeanDefinition(String beanId) {
-        return beanDefinitionsMap.get(beanId);
+    public BeanDefinition getBeanDefinition(String beanName) {
+        return beanDefinitionsMap.get(beanName);
     }
 
     public void beanDefinationRegister(String beanName, BeanDefinition definition) {
@@ -62,13 +63,40 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         return createBean(beanDefinition);
     }
 
-    public Class<?> getType(String name) throws NoSuchBeanDefinitionException, ClassNotFoundException {
+    public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
         BeanDefinition bd = this.getBeanDefinition(name);
-        if(bd == null){
+        if (bd == null) {
             throw new NoSuchBeanDefinitionException(name);
         }
         bd.resolveBeanClass(getClassLoader());
         return bd.getBeanClass();
+    }
+
+    /**
+     * 通过class查询IOC中符合条件的beanId
+     *
+     * @param type
+     * @return
+     * @throws ClassNotFoundException
+     */
+    private List<String> getBeanIDsByType(Class<?> type) {
+        List<String> result = new ArrayList<String>();
+        for (String beanName : this.beanDefinitionsMap.keySet()) {
+            //如果参数type 能够被赋值 进IOC的 bean中 则证明符合条件
+            if (type.isAssignableFrom(this.getType(beanName))) {
+                result.add(beanName);
+            }
+        }
+        return result;
+    }
+
+    public List<Object> getBeansByType(Class<?> type) {
+        List<Object> beanInstances = new ArrayList();
+        List<String> beanIDsByType = this.getBeanIDsByType(type);
+        for (String beanId : beanIDsByType) {
+            beanInstances.add(this.getBean(beanId));
+        }
+        return beanInstances;
     }
 
     public Object createBean(BeanDefinition beanDefinition) {

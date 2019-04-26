@@ -83,7 +83,7 @@ public interface BeanDefinition {
      * @return
      * @throws ClassNotFoundException
      */
-    Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException;
+    Class<?> resolveBeanClass(ClassLoader classLoader);
 
     /**
      * 判断类对象是否被加载过

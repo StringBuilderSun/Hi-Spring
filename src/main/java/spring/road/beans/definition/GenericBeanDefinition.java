@@ -38,6 +38,7 @@ public class GenericBeanDefinition implements BeanDefinition {
 
     /**
      * 通过传入一个类对象创建一个beandefinition
+     *
      * @param beanClass
      */
     public GenericBeanDefinition(Class<?> beanClass) {
@@ -96,9 +97,13 @@ public class GenericBeanDefinition implements BeanDefinition {
     }
 
 
-    public Class<?> resolveBeanClass(ClassLoader classLoader) throws ClassNotFoundException {
+    public Class<?> resolveBeanClass(ClassLoader classLoader) {
         String beanClassName = this.getBeanClassName();
-        this.beanClass = classLoader.loadClass(beanClassName);
+        try {
+            this.beanClass = classLoader.loadClass(beanClassName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("can't load class:" + beanClassName);
+        }
         return this.beanClass;
     }
 

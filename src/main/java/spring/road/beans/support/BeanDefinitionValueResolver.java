@@ -2,6 +2,7 @@ package spring.road.beans.support;
 
 import spring.road.beans.config.RuntimeBeanNameReference;
 import spring.road.beans.config.TypedStringValue;
+import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.factory.BeanFactory;
 
 /**
@@ -32,6 +33,10 @@ public class BeanDefinitionValueResolver {
             //如果是String 无需做操作 需要实现类型转换哦
             TypedStringValue typedStringValue = (TypedStringValue) value;
             value = typedStringValue.getValue();
+        } else if (value instanceof BeanDefinition) {
+            //如果参数是bean定义 需要从IOC中获取bean实例
+            BeanDefinition bd = (BeanDefinition) value;
+
         }
         //属性值是否需要被转换
         SimpleTypeConverter typeConverter = new SimpleTypeConverter();

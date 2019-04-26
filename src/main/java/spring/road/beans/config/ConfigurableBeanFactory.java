@@ -10,6 +10,7 @@ import java.util.List;
  * Created by Shanghai on 2019/3/30.
  */
 public interface ConfigurableBeanFactory extends AutowireCapableBeanFactory {
+
     void setClassLoader(ClassLoader classLoader);
 
     ClassLoader getClassLoader();

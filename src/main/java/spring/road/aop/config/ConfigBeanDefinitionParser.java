@@ -94,6 +94,32 @@ public class ConfigBeanDefinitionParser {
                 beanDefinitions.add(advisorDefinition);
             }
         }
+        List<Element> pointcuts = aspectElement.elements(POINTCUT);
+        for (Element pointcutElement : pointcuts) {
+            parsePointcut(pointcutElement, registry);
+        }
+    }
+
+    /**
+     * 将切入点表达式 也封装成 BeanDefinitation
+     *
+     * @param pointcutElement
+     * @param registry
+     */
+    private BeanDefinition parsePointcut(Element pointcutElement, BeanDefinitionRegistry registry) {
+        String id = pointcutElement.attributeValue(ID);
+        String expression = pointcutElement.attributeValue(EXPRESSION);
+
+        GenericBeanDefinition pointcutDefinition = null;
+
+        pointcutDefinition = createPointcutDefinition(expression);
+        String pointcutBeanName = id;
+        if (StringUtils.isNotEmpty(pointcutBeanName)) {
+            registry.beanDefinationRegister(pointcutBeanName, pointcutDefinition);
+        } else {
+            BeanDefinitionReaderUtils.registerWithGeneratedName(pointcutDefinition, registry);
+        }
+        return pointcutDefinition;
     }
 
     /**
