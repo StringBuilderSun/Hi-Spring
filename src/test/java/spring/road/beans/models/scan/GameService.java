@@ -13,6 +13,7 @@ import spring.road.stereotype.Component;
 @Component(value = "gameService")
 @Slf4j
 public class GameService extends Boss {
+
     @Autowired
     public Person person;
 
@@ -24,7 +25,7 @@ public class GameService extends Boss {
         this.person = person;
     }
 
-    public void playGames() throws Exception {
+    public void playGames() {
         log.info("person-name:{} play games", person.getName());
 //        throw new Exception("test exception");
     }

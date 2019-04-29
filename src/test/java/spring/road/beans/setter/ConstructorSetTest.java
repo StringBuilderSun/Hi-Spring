@@ -1,6 +1,5 @@
 package spring.road.beans.setter;
 
-import javafx.beans.binding.ObjectExpression;
 import org.junit.Assert;
 import org.junit.Test;
 import spring.road.beans.models.Person;

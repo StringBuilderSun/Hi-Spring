@@ -1,5 +1,7 @@
 package spring.road.beans.config;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class ConstructorArgument {
 
     public ValueHolder getValueHolder(String name) {
         for (ValueHolder valueHolder : this.argumentValues) {
-            if (valueHolder.getName().equals(name)) {
+            if (StringUtils.equals(valueHolder.getName(),name)) {
                 return valueHolder;
             }
         }

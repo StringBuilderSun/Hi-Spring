@@ -29,9 +29,9 @@ public class AspectJAdvisetTest {
     private static AspectJAfterThrowingAdvise throwingAdvise = null;
     private static AspectJExpressionPointcut pc = null;
     private TransactionManager tx;
-    List<MethodInterceptor> methodInterceptors;
+    List<MethodInterceptor> methodInterceptors= new ArrayList<MethodInterceptor>();
     Person person;
-
+    TransactionManager transactionManager=new TransactionManager();
 
     @Before
     public void init() throws NoSuchMethodException {
@@ -39,12 +39,13 @@ public class AspectJAdvisetTest {
         String expression = "execution(* spring.road.beans.models.scan.*.playGames(..))";
         pc = new AspectJExpressionPointcut();
         pc.setExpression(expression);
-        beforeAdvice = new AspectJBeforeAdvise(tx,
-                TransactionManager.class.getMethod("start"), pc);
-        afterAdvice = new AspectJAfterReturningAdvise(tx,
-                TransactionManager.class.getMethod("commit"), pc);
-        throwingAdvise = new AspectJAfterThrowingAdvise(tx,
-                TransactionManager.class.getMethod("rollback"), pc);
+//        beforeAdvice = new AspectJBeforeAdvise(TransactionManager.class.getMethod("start"),
+//                pc, transactionManager);
+//        afterAdvice = new AspectJAfterReturningAdvise(
+//                TransactionManager.class.getMethod("commit"),
+//                pc, transactionManager);
+//        throwingAdvise = new AspectJAfterThrowingAdvise(TransactionManager.class.getMethod("rollback"),
+//                pc, transactionManager);
         List<MethodInterceptor> methodInterceptors = new ArrayList<MethodInterceptor>();
         methodInterceptors.add(beforeAdvice);
         methodInterceptors.add(afterAdvice);
@@ -65,9 +66,9 @@ public class AspectJAdvisetTest {
     //验证代理
     public void testGetProxy() throws Exception {
         AopConfig aopConfig = new AopSupport();
-        aopConfig.addAdvice(beforeAdvice);
-        aopConfig.addAdvice(afterAdvice);
-        aopConfig.addAdvice(throwingAdvise);
+//        aopConfig.addAdvice(beforeAdvice);
+//        aopConfig.addAdvice(afterAdvice);
+//        aopConfig.addAdvice(throwingAdvise);
         GameService gameService = new GameService();
         gameService.setPerson(person);
         aopConfig.setTargetObject(gameService);

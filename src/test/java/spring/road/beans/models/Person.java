@@ -22,6 +22,12 @@ public class Person {
         this.userDao = userDao;
     }
 
+    public Person(int age,String name,  boolean sex, UserDao userDao) {
+//        this.name = name;
+//        this.age = age;
+//        this.sex = sex;
+//        this.userDao = userDao;
+    }
 
     public Person(UserDao userDao) {
         this.userDao = userDao;

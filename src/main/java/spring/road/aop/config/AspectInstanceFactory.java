@@ -1,5 +1,6 @@
 package spring.road.aop.config;
 
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import spring.road.beans.factory.BeanFactory;
 import spring.road.beans.factory.BeanFactoryAware;
@@ -14,6 +15,7 @@ public class AspectInstanceFactory implements BeanFactoryAware {
     /**
      * 切面类的 beanId
      */
+    @Setter
     private String aspectBeanName;
 
     private BeanFactory beanFactory;

@@ -1,6 +1,7 @@
 package spring.road.aop.aspectj;
 
 import org.aopalliance.intercept.MethodInvocation;
+import spring.road.aop.config.AspectInstanceFactory;
 
 import java.lang.reflect.Method;
 
@@ -10,8 +11,8 @@ import java.lang.reflect.Method;
  * Created by Shanghai on 2019/4/20.
  */
 public class AspectJAfterThrowingAdvise extends AbstractAspectJAdvice {
-    public AspectJAfterThrowingAdvise(Object adviseObject, Method adviseMethod, AspectJExpressionPointcut pointcut) {
-        super(adviseObject, adviseMethod, pointcut);
+    public AspectJAfterThrowingAdvise(Method adviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory adviceObjectFactory) {
+        super(adviceMethod, pointcut, adviceObjectFactory);
     }
 
     public Object invoke(MethodInvocation invocation) throws Throwable {

@@ -2,7 +2,10 @@ package spring.road.aop.config;
 
 import lombok.Setter;
 import spring.road.beans.config.BeanUtils;
+import spring.road.beans.exception.BeanCreateException;
 import spring.road.beans.factory.BeanFactory;
+import spring.road.beans.factory.BeanFactoryAware;
+import spring.road.beans.factory.FactoryBean;
 import spring.road.beans.utils.StringUtils;
 
 import java.lang.reflect.Method;
@@ -13,7 +16,7 @@ import java.lang.reflect.Method;
  * User: lijinpeng
  * Created by Shanghai on 2019/4/19.
  */
-public class MethodLocatingFactory {
+public class MethodLocatingFactory implements FactoryBean<Method>, BeanFactoryAware {
     @Setter
     private String targetBeanName;
     @Setter
@@ -24,7 +27,7 @@ public class MethodLocatingFactory {
     /**
      * 设置beanfactofy 并完成方法实例化
      */
-    public void setBeanFactory(BeanFactory beanFactory) throws ClassNotFoundException {
+    public void setBeanFactory(BeanFactory beanFactory) {
         if (!StringUtils.hasText(this.targetBeanName)) {
             throw new IllegalArgumentException("Property 'targetBeanName' is required");
         }
@@ -32,7 +35,12 @@ public class MethodLocatingFactory {
             throw new IllegalArgumentException("Property 'methodName' is required");
         }
 
-        Class<?> beanClass = beanFactory.getType(this.targetBeanName);
+        Class<?> beanClass = null;
+        try {
+            beanClass = beanFactory.getType(this.targetBeanName);
+        } catch (ClassNotFoundException e) {
+            throw new BeanCreateException(this.targetBeanName, "can get the bean from IOC", e);
+        }
         if (beanClass == null) {
             throw new IllegalArgumentException("Can't determine type of bean with name '" + this.targetBeanName + "'");
         }
@@ -44,7 +52,11 @@ public class MethodLocatingFactory {
         }
     }
 
-    public Object getObject() {
+    public Method getObject() {
         return this.method;
+    }
+
+    public Class<?> getObjectType() {
+        return Method.class;
     }
 }

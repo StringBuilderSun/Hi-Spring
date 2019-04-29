@@ -2,6 +2,7 @@ package spring.road.aop.aspectj;
 
 import spring.road.aop.Advice;
 import spring.road.aop.Pointcut;
+import spring.road.aop.config.AspectInstanceFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -14,10 +15,11 @@ import java.lang.reflect.Method;
  */
 public abstract class AbstractAspectJAdvice implements Advice {
 
+
     /**
-     * 切入方法的类对象
+     * 切入方法的类对象工厂
      */
-    private Object adviseObject;
+    private AspectInstanceFactory adviceObjectFactory;
     /**
      *
      */
@@ -27,10 +29,12 @@ public abstract class AbstractAspectJAdvice implements Advice {
      */
     private Method adviseMethod;
 
-    public AbstractAspectJAdvice(Object adviseObject, Method adviseMethod, AspectJExpressionPointcut pointcut) {
-        this.adviseObject = adviseObject;
+    public AbstractAspectJAdvice(Method adviceMethod,
+                                 AspectJExpressionPointcut pointcut,
+                                 AspectInstanceFactory adviceObjectFactory) {
+        this.adviseMethod = adviceMethod;
         this.pointcut = pointcut;
-        this.adviseMethod = adviseMethod;
+        this.adviceObjectFactory = adviceObjectFactory;
     }
 
 
@@ -45,7 +49,7 @@ public abstract class AbstractAspectJAdvice implements Advice {
      * @throws IllegalAccessException
      */
     public void invokeAdviseMethod() throws InvocationTargetException, IllegalAccessException {
-        adviseMethod.invoke(adviseObject);
+        adviseMethod.invoke(adviceObjectFactory.getAspectInstance());
     }
 
     public Pointcut getPointcut() {

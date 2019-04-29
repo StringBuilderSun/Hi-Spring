@@ -76,8 +76,8 @@ public class ConfigBeanDefinitionParser {
         List<RuntimeBeanNameReference> beanReferences = new ArrayList<RuntimeBeanNameReference>();
         boolean adviceFoundAlready = false;
         for (int i = 0; i < aopAspectElements.size(); i++) {
-            Element element = aopAspectElements.get(i);
-            if (isAdviceNode(element)) {
+            Element adviseEle = aopAspectElements.get(i);
+            if (isAdviceNode(adviseEle)) {
 
                 //1、如果是aop:before   aop:after-returning 这样的切面方法 生成 beandefinition
                 if (!adviceFoundAlready) {
@@ -90,7 +90,7 @@ public class ConfigBeanDefinitionParser {
                 }
                 //advisorDefinition 就是为 aop:before   aop:after-returning  生成的advisorDefinition
                 GenericBeanDefinition advisorDefinition = parseAdvice(
-                        aspectName, i, aspectElement, element, registry, beanDefinitions, beanReferences);
+                        aspectName, i, adviseEle, registry, beanDefinitions, beanReferences);
                 beanDefinitions.add(advisorDefinition);
             }
         }
@@ -127,18 +127,17 @@ public class ConfigBeanDefinitionParser {
      *
      * @param aspectName      切面方法 before  after-returning 等 用来生成切面类
      * @param order           切面类编号
-     * @param aspectElement   切面类元素
      * @param adviseEle       aop befor  after-retruning等
      * @param registry        ICO注册
      * @param beanDefinitions bean声明
      * @param beanReferences
      * @return
      */
-    private GenericBeanDefinition parseAdvice(String aspectName, int order, Element aspectElement, Element adviseEle, BeanDefinitionRegistry registry, List<BeanDefinition> beanDefinitions, List<RuntimeBeanNameReference> beanReferences) {
+    private GenericBeanDefinition parseAdvice(String aspectName, int order,Element adviseEle, BeanDefinitionRegistry registry, List<BeanDefinition> beanDefinitions, List<RuntimeBeanNameReference> beanReferences) {
         //切面方法类第一个参数  方法定位器
         GenericBeanDefinition methodDefinition = new GenericBeanDefinition(MethodLocatingFactory.class);
         methodDefinition.getpropertyValueList().add(new PropertyValue("targetBeanName", aspectName));
-        methodDefinition.getpropertyValueList().add(new PropertyValue("methodName", aspectElement.attributeValue("method")));
+        methodDefinition.getpropertyValueList().add(new PropertyValue("methodName", adviseEle.attributeValue("method")));
         methodDefinition.setSynthetic(true);
 
         // 切面方法第三个参数   切面类对象

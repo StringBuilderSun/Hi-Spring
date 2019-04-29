@@ -5,12 +5,11 @@ import spring.road.aop.config.AspectInstanceFactory;
 import spring.road.beans.utils.MessageTracerUtils;
 
 /**
- * User: lijinpeng
- * Created by Shanghai on 2019/4/19.
+ * Created by lijinpeng on 2019/4/29.
  */
-//extends  AspectInstanceFactory
 @Slf4j
-public class TransactionManager  {
+//extends AspectInstanceFactory
+public class TransactionManagerTest {
     public void start() {
         log.info("start tx");
         MessageTracerUtils.addMessage("start tx");
@@ -27,6 +26,6 @@ public class TransactionManager  {
     }
 
     public Object getAspectInstance() {
-        return new TransactionManager();
+        return new TransactionManagerTest();
     }
 }

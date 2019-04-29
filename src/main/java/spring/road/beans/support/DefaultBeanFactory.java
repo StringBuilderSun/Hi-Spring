@@ -1,6 +1,7 @@
 package spring.road.beans.support;
 
 import lombok.extern.slf4j.Slf4j;
+import spring.road.aop.aspectj.AspectJAutoProxyCreator;
 import spring.road.beans.config.ConfigurableBeanFactory;
 import spring.road.beans.config.DependencyDescriptor;
 import spring.road.beans.config.PropertyValue;
@@ -9,6 +10,7 @@ import spring.road.beans.factory.BeanFactory;
 import spring.road.beans.definition.BeanDefinition;
 import spring.road.beans.definition.BeanDefinitionRegistry;
 import spring.road.beans.exception.BeanCreateException;
+import spring.road.beans.factory.BeanFactoryAware;
 import spring.road.beans.postProcessor.BeanPostProcessor;
 import spring.road.beans.postProcessor.InstantiationAwareBeanPostProcessor;
 import spring.road.beans.utils.ClassUtils;
@@ -77,7 +79,6 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
      *
      * @param type
      * @return
-     * @throws ClassNotFoundException
      */
     private List<String> getBeanIDsByType(Class<?> type) {
         List<String> result = new ArrayList<String>();
@@ -100,9 +101,48 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
     }
 
     public Object createBean(BeanDefinition beanDefinition) {
+        //创建bean实例对象
         Object bean = instantiateBean(beanDefinition);
-        return populateBean(beanDefinition, bean);
+        //注入bean属性
+        populateBean(beanDefinition, bean);
+        //bean初始化完成后 为bean创建代理等操作
+        bean = initializeBean(beanDefinition, bean);
+        return bean;
+    }
 
+    private Object initializeBean(BeanDefinition beanDefinition, Object bean) {
+
+        invokeAwareMethods(bean);
+        //如果不是合成类 可能需要对bean创建代理操作
+        if (!beanDefinition.isSynthetic()) {
+            return applyBeanPostProcessorsAfterInitialization(bean, beanDefinition.getBeanName());
+        }
+        return bean;
+    }
+
+    private Object applyBeanPostProcessorsAfterInitialization(Object bean, String beanName) {
+        for (BeanPostProcessor beanPostProcessor : this.beanPostProcessors) {
+            if (beanPostProcessor instanceof AspectJAutoProxyCreator) {
+                //在这里拦截类的创建 执行特殊化构造
+                Object result = beanPostProcessor.afterInitialization(bean, beanName);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return bean;
+    }
+
+    /**
+     * 如果bean实现了BeanFactoryAware 需要为其设置bean工厂
+     * 以便这个bean实例化之后执行比如生成代理对象等特殊操作使用
+     *
+     * @param bean
+     */
+    private void invokeAwareMethods(Object bean) {
+        if (bean instanceof BeanFactoryAware) {
+            ((BeanFactoryAware) bean).setBeanFactory(this);
+        }
     }
 
     /**
@@ -112,7 +152,7 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
      * @param bean
      * @return
      */
-    public Object populateBean(BeanDefinition beanDefinition, Object bean) {
+    public void populateBean(BeanDefinition beanDefinition, Object bean) {
         //使用扫描包的方式获取实例化bean 通过ScannedGenericBeanDefinition 初始化bean
         for (BeanPostProcessor postProcessor : beanPostProcessors) {
             if (postProcessor instanceof InstantiationAwareBeanPostProcessor) {
@@ -122,7 +162,7 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         }
         List<PropertyValue> propertyValues = beanDefinition.getpropertyValueList();
         if (propertyValues.size() == 0) {
-            return bean;
+            return;
         }
         try {
             BeanDefinitionValueResolver valueResolver = new BeanDefinitionValueResolver(this);
@@ -141,7 +181,6 @@ public class DefaultBeanFactory extends AbstractBeanFactory implements BeanDefin
         } catch (Exception ex) {
             throw new BeanCreateException("Failed to obtain BeanInfo for class [" + beanDefinition.getBeanClassName() + "]", ex);
         }
-        return bean;
     }
 
     /**

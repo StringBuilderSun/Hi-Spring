@@ -1,5 +1,6 @@
 package spring.road.context.factory;
 
+import spring.road.aop.aspectj.AspectJAutoProxyCreator;
 import spring.road.beans.config.ConfigurableBeanFactory;
 import spring.road.beans.exception.NoSuchBeanDefinitionException;
 import spring.road.beans.postProcessor.AutowiredAnnotationProcessor;
@@ -7,6 +8,8 @@ import spring.road.beans.support.DefaultBeanFactory;
 import spring.road.beans.utils.ClassUtils;
 import spring.road.context.core.ApplicationContext;
 import spring.road.context.io.Resource;
+
+import java.util.List;
 
 /**
  * User: StringBuilderSun
@@ -38,6 +41,10 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
         return beanFactory.getType(name);
     }
 
+    public List<Object> getBeansByType(Class<?> type) {
+        return beanFactory.getBeansByType(type);
+    }
+
     /**
      * 由子类决定根据文件名 如何加载
      *
@@ -60,9 +67,13 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
      * @param beanFactory
      */
     protected void registerBeanPostProcessors(ConfigurableBeanFactory beanFactory) {
+        //注解扫描postProcessor
         AutowiredAnnotationProcessor postProcessor = new AutowiredAnnotationProcessor();
         postProcessor.setBeanFactory(beanFactory);
         beanFactory.addBeanPostProcessor(postProcessor);
-
+        //AOP生成动态代理postProcessor
+        AspectJAutoProxyCreator aspectJProx = new AspectJAutoProxyCreator();
+        aspectJProx.setBeanFactory(beanFactory);
+        beanFactory.addBeanPostProcessor(aspectJProx);
     }
 }
