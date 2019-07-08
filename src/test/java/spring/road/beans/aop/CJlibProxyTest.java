@@ -30,7 +30,6 @@ public class CJlibProxyTest {
     //方法拦截器 会拦截 所有方法 ，所以需要加判断  cglib 还提供了filter过滤器 可以用于过滤指定方法
     public class TransactionInterceptor implements MethodInterceptor {
         TransactionManager tx = new TransactionManager();
-
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
             tx.start();
             Object value = methodProxy.invokeSuper(o, objects);

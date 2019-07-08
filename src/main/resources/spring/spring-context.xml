@@ -22,7 +22,7 @@
     </bean>
     <context:component-scan base-package="spring.road.beans.models"/>
 
-    <bean id="tx" class="spring.road.beans.models.aop.TransactionManager" />
+    <bean id="tx" class="spring.road.beans.models.aop.TransactionManager"/>
 
     <aop:config>
         <aop:aspect ref="tx">
